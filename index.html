@@ -72,6 +72,38 @@
         <div id="reset-result" class="result"></div>
     </div>
 
+    <!-- Item Discount Section -->
+    <div class="card">
+        <h2>4. Item Discount Calculator</h2>
+        
+        <div class="input-group">
+            <label>Select Item:</label>
+            <select id="item-select" onchange="updatePrice()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="" disabled selected>-- Choose an item --</option>
+                <option value="10.00">Classic Burger - $10.00</option>
+                <option value="15.00">Cheesy Pizza - $15.00</option>
+                <option value="8.00">Garden Salad - $8.00</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Base Price ($):</label>
+            <input type="text" id="base-price" readonly style="background-color: #eee;">
+        </div>
+
+        <div class="input-group">
+            <label>Discount Code:</label>
+            <input type="text" id="discount-code" placeholder="Enter code">
+            <div style="margin-top: 5px;">
+                <small>Available Coupons: <span style="color: #3498db; cursor: pointer;" onclick="applyCode('WELCOME')">WELCOME</span>, <span style="color: #3498db; cursor: pointer;" onclick="applyCode('WINTER10')">WINTER10</span>, <span style="color: #3498db; cursor: pointer;" onclick="applyCode('SAVE20')">SAVE20</span></small>
+            </div>
+            <p class="bug-notice">* Hint: Does 'SAVE20' really save 20%?</p>
+        </div>
+
+        <button onclick="calculateDiscount()">Apply & Calculate</button>
+        <div id="discount-result" class="result"></div>
+    </div>
+
     <script>
         // Inline logic for UI (since we can't easily require CommonJS in a raw browser)
         
@@ -86,6 +118,15 @@
             const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
             if (!pw) return false;
             return regex.test(pw) && pw !== "Password123";
+        }
+
+        function getDiscountRate(code) {
+            const discounts = {
+                'WELCOME': 0.05,
+                'WINTER10': 0.10,
+                'SAVE20': 0.30 // BUG: Should be 0.20
+            };
+            return discounts[code.toUpperCase()] || 0;
         }
 
         // UI Handlers
@@ -120,6 +161,41 @@
                 }
             } else {
                 showResult('reset-result', 'Invalid token. Try the secret one...', true);
+            }
+        }
+
+        // Feature 4 Handlers
+        function updatePrice() {
+            const price = document.getElementById('item-select').value;
+            document.getElementById('base-price').value = price;
+        }
+
+        function applyCode(code) {
+            document.getElementById('discount-code').value = code;
+        }
+
+        function calculateDiscount() {
+            const price = parseFloat(document.getElementById('base-price').value);
+            const code = document.getElementById('discount-code').value;
+
+            if (isNaN(price)) {
+                showResult('discount-result', 'Please select an item first.', true);
+                return;
+            }
+
+            const rate = getDiscountRate(code);
+            if (code && rate === 0) {
+                showResult('discount-result', 'Invalid discount code.', true);
+                return;
+            }
+
+            const discountAmount = price * rate;
+            const finalPrice = price - discountAmount;
+
+            if (rate > 0) {
+                showResult('discount-result', `Applied! Saved $${discountAmount.toFixed(2)} (${rate * 100}%). Final Price: $${finalPrice.toFixed(2)}`);
+            } else {
+                showResult('discount-result', `No code applied. Final Price: $${finalPrice.toFixed(2)}`);
             }
         }
     </script>

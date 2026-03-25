@@ -15,6 +15,13 @@ When a QA Gap Report is provided (e.g., `US-01-gap-report.md`):
    * *Example:* `update_01_US-01-math-utils.md`
 3. **Storage Logic:** This new file acts as the "Source of Truth" for the Development and QA teams.
 
+### Strict Immutability & Versioning Rule
+1. **Never Overwrite:** You are strictly prohibited from editing or overwriting any existing `update_XX_` files.
+2. **Version Incrementing:** Before creating a file, check the directory for existing updates. 
+   - If `update_01_...` exists, your new file MUST be named `update_02_...`.
+   - Always increment the version number (`XX`) by 1 based on the highest existing version found.
+3. **Audit Trail:** Each new file must include a "Previous Update" reference in its header to maintain a clear history of changes.
+
 ## Working Protocol
 ### Step 1: Resolve the QA-ID List
 Address every ID from the Gap Report (QA-001, QA-002, etc.) with a "Decision."
