@@ -12,5 +12,13 @@
   "type": "commonjs",
   "devDependencies": {
     "jest": "^30.3.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aoaaae-sunattha/aki-exc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aoaaae-sunattha/aki-exc/issues"
+  },
+  "homepage": "https://github.com/aoaaae-sunattha/aki-exc#readme"
 }
