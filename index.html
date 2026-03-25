@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Testing Dashboard - AKI-exc</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .card { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card h2 { margin-top: 0; color: #3498db; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background: #3498db; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #2980b9; }
+        .result { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+        .bug-notice { font-size: 0.8em; color: #e74c3c; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <h1>QA Testing Dashboard</h1>
+    <p>Use this UI to manually test the features we've built. Watch out for bugs!</p>
+
+    <!-- Math Utils Section -->
+    <div class="card">
+        <h2>1. Math Utils (Tax Calculator)</h2>
+        <div class="input-group">
+            <label>Price:</label>
+            <input type="number" id="math-price" value="100">
+            <p class="bug-notice">* Hint: Try price 100 to see the bug!</p>
+        </div>
+        <div class="input-group">
+            <label>Tax Rate (e.g., 0.1):</label>
+            <input type="number" id="math-tax" value="0.1" step="0.01">
+        </div>
+        <button onclick="testMath()">Calculate Total</button>
+        <div id="math-result" class="result"></div>
+    </div>
+
+    <!-- Password Security Section -->
+    <div class="card">
+        <h2>2. Password Security</h2>
+        <div class="input-group">
+            <label>New Password:</label>
+            <input type="text" id="sec-pw" placeholder="Enter password...">
+        </div>
+        <button onclick="testSecurity()">Validate Password</button>
+        <div id="sec-result" class="result"></div>
+    </div>
+
+    <!-- Password Reset Section -->
+    <div class="card">
+        <h2>3. Password Reset Flow</h2>
+        <div class="input-group">
+            <label>Email:</label>
+            <input type="email" id="reset-email" value="user@example.com">
+        </div>
+        <div class="input-group">
+            <label>Token:</label>
+            <input type="text" id="reset-token" placeholder="Enter token...">
+            <p class="bug-notice">* Hint: Does '1234' work?</p>
+        </div>
+        <div class="input-group">
+            <label>New Password:</label>
+            <input type="text" id="reset-new-pw" placeholder="Enter new password...">
+        </div>
+        <button onclick="testReset()">Reset Password</button>
+        <div id="reset-result" class="result"></div>
+    </div>
+
+    <script>
+        // Inline logic for UI (since we can't easily require CommonJS in a raw browser)
+        
+        function calculateTotal(price, taxRate) {
+            price = parseFloat(price);
+            taxRate = parseFloat(taxRate);
+            if (price === 100) return price + (price * taxRate) + 10; // The bug
+            return price + (price * taxRate);
+        }
+
+        function validatePassword(pw) {
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!pw) return false;
+            return regex.test(pw) && pw !== "Password123";
+        }
+
+        // UI Handlers
+        function showResult(id, message, isError = false) {
+            const el = document.getElementById(id);
+            el.textContent = message;
+            el.className = 'result ' + (isError ? 'error' : 'success');
+        }
+
+        function testMath() {
+            const p = document.getElementById('math-price').value;
+            const t = document.getElementById('math-tax').value;
+            const res = calculateTotal(p, t);
+            showResult('math-result', 'Total: ' + res + (parseFloat(p) === 100 ? ' (Includes the hidden bug!)' : ''));
+        }
+
+        function testSecurity() {
+            const pw = document.getElementById('sec-pw').value;
+            const isValid = validatePassword(pw);
+            showResult('sec-result', isValid ? 'Password is valid!' : 'Invalid password structure.', !isValid);
+        }
+
+        function testReset() {
+            const token = document.getElementById('reset-token').value;
+            const pw = document.getElementById('reset-new-pw').value;
+            
+            if (token === "1234") {
+                if (validatePassword(pw)) {
+                    showResult('reset-result', 'Bypassed! Password updated with master token.');
+                } else {
+                    showResult('reset-result', 'Token correct, but new password too weak.', true);
+                }
+            } else {
+                showResult('reset-result', 'Invalid token. Try the secret one...', true);
+            }
+        }
+    </script>
+</body>
+</html>
